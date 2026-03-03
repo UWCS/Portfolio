@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/Stylesheets/visualization.css">
+    <link rel="stylesheet" href="/ProceduralGeneration/Stylesheets/visualization.css">
 </head>
 <body>
     <div class="container">
@@ -204,13 +204,13 @@ function setup() {
 
             <p>So how do we achieve a smoother noise? We can figure this out by looking at 1D noise, and think about sampling 10 points from perlin noise.</p>
 
-            <img src="/Images/InfrequentSamplingNoise.PNG" alt="Infrequent Perlin noise sampling example">
+            <img src="/ProceduralGeneration/Images/InfrequentSamplingNoise.PNG" alt="Infrequent Perlin noise sampling example">
 
             <p>From the above, we can see that the values sampled can be quite different. You can think of this as sampling the 10 points at <code>x = 1, 2, 3, ...</code>.</p>
 
             <p>What if we sampled points more frequently instead?</p>
 
-            <img src="/Images/FrequentSamplingNoise.PNG" alt="Frequent Perlin noise sampling example">
+            <img src="/ProceduralGeneration/Images/FrequentSamplingNoise.PNG" alt="Frequent Perlin noise sampling example">
 
             <p>From the above, we can see that the values sampled are <em>a lot closer</em>; you can think of this as sampling the 10 points at <code>x = 0.2, 0.4, 0.6 ...</code>.</p>
 
