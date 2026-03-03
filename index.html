@@ -11,28 +11,30 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/Boids/Stylesheets/visualization.css">
+    <link rel="stylesheet" href="/Stylesheets/visualization.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>BOIDS</h1>
-            <p class="subtitle">Simulating agents with p5.js</p>
+            <h1>Procedural Generation</h1>
+            <p class="subtitle">Procedurally generating terrain with p5.js</p>
         </header>
 
         <div class="content-grid">
             <div class="text-section">
                 <h2>What we'll make</h2>
-                <p>Boids.</p>
+                <p>Procedural terrain (click on the map to generate a new one).
+                </p>
             </div>
 
             <div class="visualization-section">
-                <div id="p5-container"></div>
+                <div id="DetailedDesertIslands"></div>
             </div>
         </div>
 
         <section class="tutorial-section">
             <h2>Intro to p5</h2>
+            <em>(This section is the same as in the Boids workshop if you've done that)</em>
             <p>p5.js is a JavaScript library that'll let us create interactive programs. 
                 It's also fairly easy to add to a website if you want to add it to a project!
             </p>
@@ -102,417 +104,331 @@ function draw() {
         </section>
 
         <section class="tutorial-section">
-            <h2>Creating a boid class: Drawing </h2>
-            <p>We'll create a class for our boids. There should be three main parts:
+            <h2>Creating Random Noise </h2>
+            <p>Let's dive straight into generating random noise! We'll need to know a couple things:
                 <ul>
-                    <li>The steering behaviour logic</li>
-                    <li>Updating the physics</li>
-                    <li>Drawing the boid to the screen</li>
+                    <li>Drawing a pixel to the screen, with a specific colour</li>
+                    <li>Generating random values</li>
+                    <li>Turning a random value into a colour</li>
+                    <li>Handling user input so we can generate on click</li>
                 </ul>
             </p>
-
-            <p>For now, let's just focus on drawing the boid to the screen; 
-                our visualisation will have boids as triangles and will point in the direction of travel (velocity).
-                Since it's just following our mouse, we'll set the velocity to some arbitrary direction. </p>
             
-            <h3>Initialiser</h3>
-            <p>Note that static variables are just variables that belong to the class rather than a specific instance
-                - so editing one changes it for all instances of the class
-                (p5 may also warn you about initialising a static variable but it should be fine).
+            <h3>Drawing Pixels</h3>
+
+            <p>In the section above, we looked at the <code>stroke()</code> function - we can also call this function with just a single number.
+            This would represent a grayscale colour with the number representing the brightness (or "value") of the colour. 
+        Can you guess what the following code does? </p>
+
+             <pre><code class="language-javascript">function setup() {
+    createCanvas(400, 400);
+    
+    for(let y = 0; y &lt 400; y++){
+        for(let x = 0; x &lt= 255; x++){
+        stroke(x);
+        point(x,y);
+        }
+    }
+}</code></pre>
+
+            <p>See what it does by checking out <a href="https://editor.p5js.org/RexMortem/sketches/rnRm8EqTf">https://editor.p5js.org/RexMortem/sketches/rnRm8EqTf </a></p>
+            
+            <h3>Random Values</h3>
+
+            <p>We can use random functions from JavaScript - let's use JS' Math library. </p>
+
+            <pre><code class="language-javascript">for(let i = 0; i &lt 20; i++){
+    console.log(Math.random()); // values between 0-1
+}</code></pre>
+            
+            <p>So we're generating values between 0-1; all we need to do is scale it up by 255 to get the right range! </p>
+            
+            <h3>Generating On-Click</h3>
+
+            <p>We'd also like to do something on-click. This is two things:
+            
+                <ul>
+                    <li>Detecting a click</li>
+                    <li>Detecting that the click is within the canvas</li>
+                </ul>
             </p>
             
-            <pre><code class="language-javascript">class Boid {
-  static size = 20;
+            <p>We can detect a click using the <code>mouseClicked()</code> event. </p>
 
-  constructor(){
-    this.position = createVector(0,0);
-    this.velocity = createVector(1,0);
-    this.acceleration = createVector(0,0);
+            <pre><code class="language-javascript">function mouseClicked(){
+    console.log("mouse click!");
+}
+            </code></pre>
+
+            <p>We can detect whether the click is within the bounds using the width and height values we pass to <code>createCanvas()</code>,
+            as well as <code>mouseX</code> and <code>mouseY</code>. </p>
+
+            <p>Try to come up with this yourself, but the code is here: <a href="https://editor.p5js.org/RexMortem/sketches/Zj5uLmAcH">https://editor.p5js.org/RexMortem/sketches/Zj5uLmAcH</a></p>
+
+            <h3>Putting it together</h3>
+
+            <p>Now put it together and produce random noise. Here's a template to complete: </p>
+
+            <pre><code class="language-javascript">const width = 400; // these are "constant" variables, as they don't change
+const height = 400; // made to be variables since they're used in 2 places (iterating and createCanvas)
+
+function drawRandomNoise(){
+    for(let x = 0; x &lt width; x++){
+        for(let y = 0; y &lt height; y++){
+            // FILL ME
+        }
+    }
+}
+function setup() {
+    createCanvas(width, height);
+    drawRandomNoise();
+}
+
+// ADD CODE TO GENERATE ON CLICK
+</code></pre>
+
+            <p><em>Code for this section: <a href="https://editor.p5js.org/RexMortem/sketches/Bj-eKhMKr">https://editor.p5js.org/RexMortem/sketches/Bj-eKhMKr</a></em></p>
+        </section>
+        
+        <section class="tutorial-section">
+            <h2>Perlin Noise</h2>
+            <p>Okay so we've programmed <em>random noise</em> which is "incoherent" noise - you can have sharp constrasts between neighbouring pixels.
+                If we want nice smooth gradients, then we can use perlin noise!
+            </p>
+
+            <div id="NoiseHeightMap"></div>
+
+            <p>We can definitely see that the noise is more ordered than random noise, however we want it to be less sharp; we want it to be smoother.</p>
+
+            <h3>Smoothing it out</h3>
+
+            <p>So how do we achieve a smoother noise? We can figure this out by looking at 1D noise, and think about sampling 10 points from perlin noise.</p>
+
+            <img src="/Images/InfrequentSamplingNoise.PNG" alt="Infrequent Perlin noise sampling example">
+
+            <p>From the above, we can see that the values sampled can be quite different. You can think of this as sampling the 10 points at <code>x = 1, 2, 3, ...</code>.</p>
+
+            <p>What if we sampled points more frequently instead?</p>
+
+            <img src="/Images/FrequentSamplingNoise.PNG" alt="Frequent Perlin noise sampling example">
+
+            <p>From the above, we can see that the values sampled are <em>a lot closer</em>; you can think of this as sampling the 10 points at <code>x = 0.2, 0.4, 0.6 ...</code>.</p>
+
+            <p>So the general takeaway is that we can generate smoother noise, by sampling more frequently. How do we do that? We can just divide <code>x</code>, <code>y</code> before feeding it into the noise function!</p>
+
+            <div id="SmoothNoiseHeightMap"></div>
+
+            <h2>Task: Smooth Noise</h2>
+
+            <p>Use the tools above to generate some smooth perlin noise! Have a variable called the smoothing factor, and change its value to see how the noise varies.</p>
+
+            <h2>Creating Islands</h2>
+
+            <p>We now have the tools to create islands! By designating pixel with noise values past a certain threshold as "land" and the rest as "ocean", we can generate islands.
+                Since the <strong>noise()</strong> function returns a value between 0 and 1, we should have a threshold value between 0 and 1.
+            </p>
+
+            <pre><code class="language-javascript">const threshold = 0.55;
+
+function getColour(noiseVal){
+  if(noiseVal > threshold){
+    return color(239, 221, 111); // sandy yellow (island)
+  }else{
+    return color(0, 157, 196); // ocean blue
   }
 }</code></pre>
 
-            <p>If you want to understand how vectors in p5 work better, you can check the docs: <a href="https://p5js.org/reference/p5/p5.Vector/">https://p5js.org/reference/p5/p5.Vector/</a></p>
-
-            <h3>Drawing a triangle</h3>
-
-            <p><strong>(If you're not interested in the maths, then feel free to just copy the triangle drawing code at the link at the bottom)</strong></p>
-
-            <p>To draw a <a href="https://p5js.org/reference/p5/triangle/">triangle</a> in p5, we have to provide the coordinates to the points of the triangle.</p>
-
-            <p>One point (p1) can just be the boid's position, but the other two points should be drawn so that the triangle points
-                in the direction of the boid's velocity.
+            <p>Note that the above function returns a "colour" object; if you want to work with large p5.js programs, then you should really be using classes and objects.
+                Now we can use the returned colour object like so:
             </p>
 
-            <p>We can do this by creating difference vectors that'll represent the sides of the triangle - one side being between p1 and p2, and the other being between p2 and p3.
-                We generate these difference vectors by just rotating the velocity and scaling it to be the size of the length of our boid.
+            <pre><code class="language-javascript">let colour = getColour(noise(x/sf, y/sf)); // colour object
+stroke(colour); // stroke accepts the colour object directly (instead of number values representing a colour)</code></pre>
+
+            <h2>Task: Desert Islands</h2>
+
+            <p>Create desert island generation by modifying your smooth noise task, with the above tools. It should look something like below:</p>
+
+            <div id="DesertIslands"></div>
+
+            <h3>More Detailed Islands</h3>
+
+            <p>Sometimes, you want more detailed islands; you want the overall shape of the islands to be the same so you have the same smoothness factor,
+                but you want there to be some more granular detail. You might want your beaches to have some roughness to its terrain.
+
+                After all, terrain isn't perfectly smooth in nature!
             </p>
-            
-            <p>We will create a <code>drawBoid()</code> method inside of the Boid class to do this: </p>
-            <pre><code class="language-javascript">
-drawBoid(){
-    let heading = this.velocity;
-    
-    let dp2 = heading.copy();
-    
-    dp2.rotate(170);
-    dp2.setMag(Boid.size);
-    
-    let dp3 = heading.copy();
-    
-    dp3.rotate(190);
-    dp3.setMag(Boid.size);
-    
-    // finish the code to add dp2, dp3 to form p2, p3
-    // call the triangle method to draw our triangle, now that we know p1 (this.position), p2, p3
+
+            <p>You can add this granular detail by adding layers of perlin noise together; each of these layers being called "octaves".
+                Typically, you'll have a large amplitude perlin noise wave which describes the general overall shape,
+                and then you'll have a smaller amplitude perlin noise waves to describe the finer details.
+                These smaller waves usually have higher frequency, which will give the islands a distinct roughness.
+            </p>
+
+            <p>You can increase the number of octaves and how much the smaller waves contribute to the noise by using p5's <strong>noiseDetail()</strong> function.
+                Read up on the details <a href="https://p5js.org/reference/p5/noiseDetail/">here</a>.
+            </p>
+
+            <p>You can also add more "detail" to the islands by creating multiple threshold levels, like in the example at the top of this webpage! An example of a more complicated threshold colour function:</p>
+
+            <pre><code class="language-javascript">const snowcapThreshold = 0.75;
+const mountainThreshold = 0.6;
+const grassThreshold = 0.4;
+const shallowWaterThreshold = 0.35;
+
+function getColour(noiseVal){
+  if(noiseVal > snowcapThreshold){
+    return color(219, 219, 219); // snowcap white
+  }else if(noiseVal > mountainThreshold){
+    return color(112, 112, 112); // mountain gray
+  }else if(noiseVal > grassThreshold){
+    return color(75, 139, 59); // grass green
+  }else if(noiseVal > shallowWaterThreshold){
+    return color(0, 157, 196); // light blue
+  }else{
+    return color(0, 147, 186); // slightly darker blue
   }
-    </code>
-</pre>
-            <p>Note that we are using degrees inside of the <code>rotate()</code> method - 
-            for this to work, we have to call <code>angleMode(DEGREES)</code> at some point. 
-        You should probably put this in <code>setup()</code> somewhere.</p>
+}</code></pre>
 
-            <p><strong>TIP: </strong> When completing this function - 
-                keep in mind that if you're creating another vector from an existing one, you should <strong>copy</strong> it.
-            Otherwise, editing the new variable will also edit the original vector.
+            <h2>Create your own islands!</h2>
+
+            <p>You have everything you need to create your own amazing terrain generation!
+                You can take my generator(s) (displayed at the top of the page) as inspiration, but I'm sure you'll be able to create a better looking generator than mine.
             </p>
 
-            <p>Example of code which changes the original vector:</p>
-
-            <pre><code class="language-javascript">let original = createVector(10, 0);
-let another = original.add(createVector(25, 0));
-  
-console.log("Original: ", original.x, original.y); // What is this?
-console.log("Another: ", original.x, original.y);
-</code>
-</pre>
-            <h3>Edge Case: velocity being 0</h3>
-            
-            <p>There is an edge-case we haven't considered: what will happen when the velocity is (0, 0)? </p>
-
-            <p>To fix this, just add a check at the top - if it is (0, 0), then set heading to (0, 1). </p>
-
-            <h3>Drawing the boid</h3>
-
-            <p>Let's draw our boid at the mouse's position! </p>
-            <pre><code class="language-javascript">let mouseBoid; // here so both "setup" and "draw" can see it
-
-function setup() {
-  angleMode(DEGREES);
-  createCanvas(400, 400);
-  
-  mouseBoid = new Boid(); // we have to create inside of setup
-}
-
-function draw() {
-  background(220);
-  mouseBoid.position = createVector(mouseX, mouseY);
-  mouseBoid.drawBoid();
-}</code>
-</pre>
-
-            <p><em>Code for this section: <a href="https://editor.p5js.org/RexMortem/sketches/YDrsmVmJE">https://editor.p5js.org/RexMortem/sketches/YDrsmVmJE</a></em></p>
-        </section>
-
-        <section class="tutorial-section">
-            <h2>Creating a boid class: physics and many boids </h2>
-            <p>Let's add acceleration to our boids. To do this, let's create 10 or so boids at the top of our screen
-                and give them some downwards acceleration!
-            </p>
-            
-            
-            <h3>Adding a physics update method </h3>
-            
-            <p>As explained in the presentation, you should update velocity and acceleration in a specific way to do it accurately.</p>
-
-            <pre><code class="language-javascript">updatePhysics(){
-    this.position.add(0.5 * this.velocity.x * dt, 0.5 * this.velocity.y * dt);
-    this.velocity.add(this.acceleration.x * dt, this.acceleration.y * dt);
-    this.position.add(0.5 * this.velocity.x * dt, 0.5 * this.velocity.y * dt); 
-}</code>
-</pre>
-
-            <h3>Creating many boids</h3>
-            <p>Instead of just a boid at our mouse's position, we'll need to track many boids - let's use an array. </p>
-
-            <pre><code class="language-javascript">const boids = [];
-const nBoids = 20;
-
-function setup() {
-  angleMode(DEGREES);
-  createCanvas(400, 400);
-  
-  for(let i = 0; i &lt nBoids; i++){
-    let newBoid = new Boid();
-
-    // INSERT code to space the boids out!
-    // INSERT code to set acceleration! 
-
-    boids.push(newBoid);
-  }
-}</code>
-</pre>  
-        <p>Edit the code to position the boids in appropriate start locations - maybe set position so 
-            they're in a straight line at the top?
-        </p>
-
-        <p>Also edit the code to set the boid's acceleration. </p>
-
-        <p>And our draw logic is even more straightforward: </p>
-        <pre><code class="language-javascript">function draw() {
-  background(220);
-  
-  for(let i = 0; i &lt nBoids; i++){
-    boids[i].updatePhysics(deltaTime*0.001); // deltaTime is milliseconds so we scale it
-    boids[i].drawBoid();
-  }
-}</code>
-</pre>
-        <p><em>Code for this section: <a href="https://editor.p5js.org/RexMortem/sketches/7NjQdeUks">https://editor.p5js.org/RexMortem/sketches/7NjQdeUks</a></em></p>
-        </section>
-
-        <section class="tutorial-section">
-            <h2>Example Steering Behaviour: Seeking</h2>
-            <p>We're going to add behaviour for the boids to seek the mouse! </p>
-
-            <p>The steering behaviour formula is: <strong>Steering Force = Desired Velocity - Current Velocity</strong>
-            
-            </p>
-            
-            <p>So to calculate our force (which is equivalent to acceleration through F=ma given constant mass), 
-                we just need to calculate desired velocity and then calculate steering force.
-            </p>
-
-            <p>So what is desired velocity for the <strong>Seek</strong> steering behaviour? 
-            It's the difference between the target's position and our current position! </p>
-
-            <pre><code class="language-javascript">seek(target){
-    // Fill in these variables! Use the sub method for p5 vectors (look it up)
-    let desiredVel = 
-    let steeringForce = 
-
-    this.acceleration = steeringForce;
-  }</code>
-</pre>
-
-            <p>Note that the target here is the position of the target we're seeking (which should be the mouse).</p>
-            
-<p>Also make sure to call the <code>seek()</code> function inside of draw - probably before updating physics and drawing!</p>
-
-            <h3>Setting parameters </h3>
-
-            <p>This works, but we might want our boids to move slower or turn slower or so on. 
-                We should have parameters for the magnitude of the desired velocity (so how quickly it should move when it achieves desired velocity) 
-                and for how quickly the velocity changes (in other words, set magnitude of our force).
-            </p>
-
-            <p>Do the following:
-                <ul>
-                    <li>Add the static variables desiredVelSpeed and forceMag</li>
-                    <li>Use <code>setMag()</code> inside of <code>seek()</code> to scale with the static variables</li>
-                </ul>
-            </p>
-
-            <p>If you want, you can also use <code>limit()</code> instead of <code>setMag()</code> to add limits.</p>
-
-            <p><em>Code for this section: <a href="https://editor.p5js.org/RexMortem/sketches/yhSvBttdX">https://editor.p5js.org/RexMortem/sketches/yhSvBttdX</a></em></p>
-        </section>
-        
-        <section class="tutorial-section">
-            <h2>Example Steering Behaviour: Separation </h2>
-            <p>A core steering behaviour of traditional boids are that they try to avoid colliding into each other. 
-                This is also interesting since it's a group-based steering behaviour.
-            </p>
-
-            <p>We will use the same steering force calculation as before, but we will need a more 
-                involved calculation to find desired velocity.
-            </p>
-            
-            <h3>Stay Away!</h3>
-
-            <p>To code separation, we want to receive a list of all the boids and do the following:
-                <ul>
-                    <li>Create a variable for the desired minimum separation</li>
-                    <li>Loop through all boids which aren't the current boid</li>
-                    <li>If they're closer than the minimum separation, create an away velocity which points away from the other boid</li>
-                    <li>Add all these forces from all the other boids together and create an average desired velocity</li>
-                    <li>Apply the same steering force calculations as before</li>
-                </ul>
-            </p>
-            
-            <p>To test, we want to change the initialisation to create a 2D grid of boids. </p>
-
-            <p><em>Code for this section: <a href="https://editor.p5js.org/RexMortem/sketches/REqnNmpG_">https://editor.p5js.org/RexMortem/sketches/REqnNmpG_</a></em></p>
-        </section>
-
-        <section class="tutorial-section">
-            <h2>Combining Steering Behaviours</h2>
-            <p> Combining steering behaviours is pretty simple - if we amend our steering behaviours
-                to return a force, then we can apply weights to the returned forces and add them up.
-            </p>
-
-            <p>We then get a function like this: </p>
-            
-            <pre><code class="language-javascript">steer(target, boids, nBoids){
-    let sepForce = this.separate(boids, nBoids);
-    let seekForce = this.seek(target);
-
-    this.acceleration = sepForce.add(seekForce);
-}</code>
-</pre>
-
-        </section>
-        
-        <section class="tutorial-section">
-            <h2>Resources</h2>
-            <p>This workshop wouldn't have been possible without the existing work and tutorials on boids.
-                If you're interested in learning more, check out the links below:
-            </p>
-            
+            <p>You can view the code for my two generators here:</p>
             <ul>
-                <li><a href="https://natureofcode.com/autonomous-agents/">https://natureofcode.com/autonomous-agents/</a></li>
-                <li><a href="https://www.red3d.com/cwr/boids/">https://www.red3d.com/cwr/boids/</a></li>
+                <li><a href="https://editor.p5js.org/RexMortem/sketches/sk3iSZ_ly">Desert Island Generator</a></li>
+                <li><a href="https://editor.p5js.org/RexMortem/sketches/-9_U5dF6S">Mountainous Terrain Generator</a></li>
+            </ul>
+
+            <p><strong>Tip:</strong> Getting good terrain with perlin noise is often a case of just tweaking your parameters (octaves, amplitude/frequency, smooth factor etc) until they're <em>just</em> right.</p>
+        </section>
+
+        <section class="tutorial-section">
+            <h2>Going Further</h2>
+
+            <p>If you want to make your generator even cooler, then you can explore more procedural generation techniques. Natural next steps include:</p>
+
+            <ul>
+                <li>Adding rivers (perhaps using perlin worms)</li>
+                <li>Adding trees e.g. with poisson-disc sampling</li>
+                <li>Structure generation</li>
             </ul>
            
+        </section>
+
+        <section class="tutorial-section">
+            <h2>Resources</h2>
+            <p>This workshop wouldn't have been possible without the existing work and tutorials on perlin noise.
+                If you're interested in learning more, check out Ken Perlin.
+            </p>
         </section>
     </div>
 
     <script>
-        // Load the basicp5.js sketch
-        let sketchInstance;
+let DetailedDesertMap = new p5((sk) => {
+    const width = 150;
+    const height = 150;
 
-        function sketch(p) {
-            class Boid {
-  static size = 20;
-  static desiredSeekSpeed = 50;
-  static seekForceMag = 25;
-  static desiredSepSpeed = 20;
-  static sepForceMag = 15;
+    const sf = 25;
 
-  constructor(){
-    this.position = p.createVector(0,0);
-    this.velocity = p.createVector(0,0);
-    this.acceleration = p.createVector(0,0);
-  }
-  
-  drawBoid(){
-    let heading = this.velocity;
-    
-    if((heading.x == 0) && (heading.y == 0)){
-       heading = p.createVector(0, 1);
+    // I love having hardcoded threshold values 
+    function getColour(noiseVal){
+        if (noiseVal > 0.7){
+            return sk.color(209, 191, 81); // darker yellow
+        } else if (noiseVal > 0.55){
+            return sk.color(239, 221, 111); // sandy yellow (island)
+        } else if (noiseVal > 0.4){
+            return sk.color(0, 157, 196); // ocean blue
+        } else{
+            return sk.color(0, 127, 166); // deeper blue
+        }
     }
-    
-    let dp2 = heading.copy();
-    
-    dp2.rotate(170);
-    dp2.setMag(Boid.size);
-    
-    let dp3 = heading.copy();
-    
-    dp3.rotate(190);
-    dp3.setMag(Boid.size);
-    
-    let p2 = this.position.copy().add(dp2);
-    let p3 = this.position.copy().add(dp3);
-    
-    p.triangle(this.position.x, this.position.y, p2.x, p2.y, p3.x, p3.y);
-  }
- 
-  updatePhysics(dt){
-    this.position.add(0.5 * this.velocity.x * dt, 0.5 * this.velocity.y * dt);
-    this.velocity.add(this.acceleration.x * dt, this.acceleration.y * dt);
-    this.position.add(0.5 * this.velocity.x * dt, 0.5 * this.velocity.y * dt); 
-  }
-  
-  separate(boids, nBoids){
-    let desiredSeparationDist = 20;
-    
-    for(let i =0; i < nBoids; i++){
-      let otherBoid = boids[i];
-      
-      if (this == otherBoid){
-        continue;
-      }
-      
-      let distance = p5.Vector.dist(this.position, otherBoid.position);
-      let sum = p.createVector();
-      let nCloseBoids = 0;
-      
-      if (distance < desiredSeparationDist){ // get away
-        let awayVector = this.position.copy().sub(otherBoid.position);
-        awayVector.setMag(1);
+
+    function drawMap(){
+        sk.background(255,255,255);
+        sk.noiseSeed(Math.random()*1000);
         
-        sum.add(awayVector);
-        nCloseBoids++;
-      }
-      
-      if (nCloseBoids > 0){
-        sum.setMag(Boid.desiredSepSpeed);
-
-        let steeringForce = sum.sub(this.velocity);
-        steeringForce.setMag(Boid.sepForceMag);
-
-        return steeringForce;
-      }
-    }
-    
-    return p.createVector(0,0);
-  }
-
-  seek(target){
-    let desiredVel = target.copy().sub(this.position);
-    desiredVel.setMag(Boid.desiredSeekSpeed);
-    
-    let steeringForce = desiredVel.sub(this.velocity);
-    steeringForce.setMag(Boid.seekForceMag);
-    
-    return steeringForce;
-  }
-
-  steer(target, boids, nBoids){
-    let sepForce = this.separate(boids, nBoids);
-    let seekForce = this.seek(target);
-    
-    this.acceleration = sepForce.add(seekForce);
-  }
-}
-
-const boids = [];
-const nBoids = 400;
-
-            p.setup = function() {
-                p.angleMode(p.DEGREES);
-                p.createCanvas(400, 400);
-                
-                p.fill("teal");
-                
-                for(let x = 0; x < 20; x++){
-                    for(let y = 0; y < 20; y++){
-                    let newBoid = new Boid();
-
-                    newBoid.position = p.createVector(5 + x*15, 5 + y*15);
-                    
-                    boids.push(newBoid);
-                    }
-                }
-            }
-
-            p.draw = function() {
-                p.background(220);
-                let mouseVector = p.createVector(p.mouseX, p.mouseY);
-                
-                for(let i = 0; i < nBoids; i++){
-                    boids[i].steer(mouseVector, boids, nBoids);
-                    //console.log(boids[i].acceleration);
-                    
-                    boids[i].updatePhysics(p.deltaTime*0.001);
-                    boids[i].drawBoid();
-                }
+        for(let x = 0; x < width; x++){
+            for(let y = 0; y < height; y++){
+                sk.stroke(getColour(sk.noise(x/sf, y/sf)));
+                sk.point(x,y);
             }
         }
+    }
 
-        // Create p5 instance in the container
-        let container = document.getElementById('p5-container');
-        sketchInstance = new p5(sketch, container);
+    sk.setup = () => {
+        let cnv = sk.createCanvas(width, height);
+        cnv.parent("DetailedDesertIslands");
+
+        sk.noiseDetail(8, 0.5);
+        sk.describe("Click to generate new Perlin Noise threshold map!");
+        
+        drawMap();
+    }
+
+    function onSim(){
+        return ((sk.mouseX >= 0) && (sk.mouseX <= width) && (sk.mouseY >= 0) && (sk.mouseY <= height));
+    }
+
+    sk.mouseClicked = () => {
+        if(onSim()){
+            drawMap();
+        }
+    }
+});
+    </script>
+
+
+    <script>
+        let desertIslands = new p5((sk) => {
+    const width = 150;
+    const height = 150;
+
+    const threshold = 0.55;
+    const sf = 25;
+
+    function getColour(noiseVal){
+        if(noiseVal > threshold){
+            return sk.color(239, 221, 111); // sandy yellow (island)
+        }else{
+            return sk.color(0, 157, 196); // ocean blue
+        }
+    }
+
+    function drawMap(){
+        sk.background(255,255,255);
+        sk.noiseSeed(Math.random()*1000);
+        
+        for(let x = 0; x < width; x++){
+            for(let y = 0; y < height; y++){
+                let c = getColour(sk.noise(x/sf, y/sf));
+                sk.stroke(c);
+                sk.point(x,y);
+            }
+        }
+    }
+
+    sk.setup = () => {
+        let cnv = sk.createCanvas(width, height);
+        cnv.parent("DesertIslands");
+
+        sk.describe("Click to generate desert islands!");
+        
+        drawMap();
+    }
+
+    function onSim(){
+        return ((sk.mouseX >= 0) && (sk.mouseX <= width) && (sk.mouseY >= 0) && (sk.mouseY <= height));
+    }
+
+    sk.mouseClicked = () => {
+        if(onSim()){
+            drawMap();
+        }
+    }
+});
     </script>
 </body>
 </html>
