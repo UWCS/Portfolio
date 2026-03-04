@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Visualization</title>
+    <title>Portfolio</title>
     
     <!-- p5.js library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
@@ -11,542 +11,170 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/ProceduralGeneration/Stylesheets/visualization.css">
+    <link rel="stylesheet" href="/Portfolio/Stylesheets/visualization.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Procedural Generation</h1>
-            <p class="subtitle">Procedurally generating terrain with p5.js</p>
+            <h1>Portfolio Website</h1>
+            <p class="subtitle">Showcase your skills</p>
         </header>
 
-        <div class="content-grid">
-            <div class="text-section">
-                <h2>What we'll make</h2>
-                <p>Procedural terrain (click on the map to generate a new one).
-                </p>
-            </div>
-
-            <div class="visualization-section">
-                <div id="DetailedDesertIslands"></div>
-            </div>
-        </div>
-
         <section class="tutorial-section">
-            <h2>Intro to p5</h2>
-            <em>(This section is the same as in the Boids workshop if you've done that)</em>
-            <p>p5.js is a JavaScript library that'll let us create interactive programs. 
-                It's also fairly easy to add to a website if you want to add it to a project!
+            <h2>GitHub Pages</h2>
+            <p>
+                We'll be using GitHub Pages to serve our static site. 
+                A quick reminder from the slides: a static site is when the server just serves pre-built content
+                "as-is" so there's no customisation from the user requesting it for what content is received. 
+                It can be viewed as a server-less tech stack.
             </p>
             
             
-            <h3>Getting Started: p5 editor</h3>
+            <h3>Creating your Repository</h3>
             
-            <p>We'll be using the p5 editor to write and run our p5 simulations:
+            <p> To follow these steps, you should have a GitHub account. 
+                If you don't have one, sign up for one at <a href="https://github.com/signup">https://github.com/signup</a>.
                 <ul>
-                    <li>Go to <a href="https://editor.p5js.org/">https://editor.p5js.org/</a></li>
-                    <li>Create an account</li>
-                    <li>Create a new sketch</li>
+                    <li>Create a new repository (green "New" button on homepage) </li>
+                    <li>Go to the settings of the repository</li>
+                    <li>Go to <strong>Pages</strong> (under the Code and Automation section)</li>
+                    <li>Select "Deploy from a branch"</li>
+                    <li>Configure it to be "main" and save</li>
                 </ul>
             </p>
 
-            <h3>Basics of p5</h3>
-            <p>Here's a basic initial p5 program. </p>
-            <pre><code class="language-javascript">function setup() { // this is run once at the start
-  createCanvas(400, 400);
-  console.log("Start!");
-}
+            <h3>Testing Pages: basic HTML </h3>
+            <p>Here's a basic HTML program to test your repository. </p>
+            <pre><code class="language-html">
+&lt;!DOCTYPE html&gt;
 
-function draw() { // this is run every frame
-  background(220);
-  console.log("Every frame");
-}
+&lt;html lang="en"&gt;
+    &lt;head&gt;
+        &lt;title&gt;Ed's Portfolio&lt;/title&gt;
+        &lt;meta charset="UTF-8"&gt;
+    &lt;body&gt;
+        &lt;h1&gt;Hello world&lt;/h1&gt;
+        &lt;p&gt;I'm alive!&lt;/p&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
 </code></pre>
-            <p>p5.js works by providing two main functions: <code>setup()</code> (run once) and <code>draw()</code> (run continuously, every frame). </p>
             
-            <p>Critically, <strong> you can only use p5 library functions inside of these functions. </strong> </p>
-
-            <p>We can see the key difference between <code>setup()</code> and <code>draw()</code> when we look at the following two slightly different programs: </p>
-            <pre><code class="language-javascript">function setup() { 
-  createCanvas(400, 400);
-}
-
-function draw() { 
-  background(220); 
-  circle(mouseX, mouseY, 40);
-}</code></pre>
-
-            <pre><code class="language-javascript">function setup() { 
-  createCanvas(400, 400);
-  background(220); 
-}
-
-function draw() { 
-  circle(mouseX, mouseY, 40);
-}</code></pre>
-
-            <p>So in the first example, background is called inside of <code>draw()</code> and this covers stuff drawn in the previous frames. </p>
-
-            <h3>Getting Colourful</h3>
-            <p>To inject some fun into our dreary lives, we can add some colour! The <code>stroke()</code> function sets the colour of the perimeter of shapes whenever called and <code>fill()</code> does this for the area.</p>
-
-            <pre><code class="language-javascript">function setup() { 
-  createCanvas(400, 400);
-  background(220); 
-  
-  stroke("red");
-  fill("yellow");
-}
-
-function draw() { 
-  circle(mouseX, mouseY, 40);
-}</code></pre>
-        </section>
-
-        <section class="tutorial-section">
-            <h2>Creating Random Noise </h2>
-            <p>Let's dive straight into generating random noise! We'll need to know a couple things:
-                <ul>
-                    <li>Drawing a pixel to the screen, with a specific colour</li>
-                    <li>Generating random values</li>
-                    <li>Turning a random value into a colour</li>
-                    <li>Handling user input so we can generate on click</li>
-                </ul>
-            </p>
-            
-            <h3>Drawing Pixels</h3>
-
-            <p>In the section above, we looked at the <code>stroke()</code> function - we can also call this function with just a single number.
-            This would represent a grayscale colour with the number representing the brightness (or "value") of the colour. 
-        Can you guess what the following code does? </p>
-
-             <pre><code class="language-javascript">function setup() {
-    createCanvas(400, 400);
-    
-    for(let y = 0; y &lt 400; y++){
-        for(let x = 0; x &lt= 255; x++){
-        stroke(x);
-        point(x,y);
-        }
-    }
-}</code></pre>
-
-            <p>See what it does by checking out <a href="https://editor.p5js.org/RexMortem/sketches/rnRm8EqTf">https://editor.p5js.org/RexMortem/sketches/rnRm8EqTf </a></p>
-            
-            <h3>Random Values</h3>
-
-            <p>We can use random functions from JavaScript - let's use JS' Math library. </p>
-
-            <pre><code class="language-javascript">for(let i = 0; i &lt 20; i++){
-    console.log(Math.random()); // values between 0-1
-}</code></pre>
-            
-            <p>So we're generating values between 0-1; all we need to do is scale it up by 255 to get the right range! </p>
-            
-            <h3>Generating On-Click</h3>
-
-            <p>We'd also like to do something on-click. This is two things:
-            
-                <ul>
-                    <li>Detecting a click</li>
-                    <li>Detecting that the click is within the canvas</li>
-                </ul>
-            </p>
-            
-            <p>We can detect a click using the <code>mouseClicked()</code> event. </p>
-
-            <pre><code class="language-javascript">function mouseClicked(){
-    console.log("mouse click!");
-}
-            </code></pre>
-
-            <p>We can detect whether the click is within the bounds using the width and height values we pass to <code>createCanvas()</code>,
-            as well as <code>mouseX</code> and <code>mouseY</code>. </p>
-
-            <p>Try to come up with this yourself, but the code is here: <a href="https://editor.p5js.org/RexMortem/sketches/Zj5uLmAcH">https://editor.p5js.org/RexMortem/sketches/Zj5uLmAcH</a></p>
-
-            <h3>Putting it together</h3>
-
-            <p>Now put it together and produce random noise. Here's a template to complete: </p>
-
-            <pre><code class="language-javascript">const width = 400; // these are "constant" variables, as they don't change
-const height = 400; // made to be variables since they're used in 2 places (iterating and createCanvas)
-
-function drawRandomNoise(){
-    for(let x = 0; x &lt width; x++){
-        for(let y = 0; y &lt height; y++){
-            // FILL ME
-        }
-    }
-}
-function setup() {
-    createCanvas(width, height);
-    drawRandomNoise();
-}
-
-// ADD CODE TO GENERATE ON CLICK
-</code></pre>
-
-            <p><em>Code for this section: <a href="https://editor.p5js.org/RexMortem/sketches/Bj-eKhMKr">https://editor.p5js.org/RexMortem/sketches/Bj-eKhMKr</a></em></p>
-        </section>
-        
-        <section class="tutorial-section">
-            <h2>Perlin Noise</h2>
-            <p>Okay so we've programmed <em>random noise</em> which is "incoherent" noise - you can have sharp constrasts between neighbouring pixels.
-                If we want nice smooth gradients, then we can use perlin noise!
-            </p>
-
-            <div id="NoiseHeightMap"></div>
-
-            <p>We can definitely see that the noise is more ordered than random noise, however we want it to be less sharp; we want it to be smoother.</p>
-
-            <h3>Smoothing it out</h3>
-
-            <p>So how do we achieve a smoother noise? We can figure this out by looking at 1D noise, and think about sampling 10 points from perlin noise.</p>
-
-            <img src="/ProceduralGeneration/Images/InfrequentSamplingNoise.PNG" alt="Infrequent Perlin noise sampling example">
-
-            <p>From the above, we can see that the values sampled can be quite different. You can think of this as sampling the 10 points at <code>x = 1, 2, 3, ...</code>.</p>
-
-            <p>What if we sampled points more frequently instead?</p>
-
-            <img src="/ProceduralGeneration/Images/FrequentSamplingNoise.PNG" alt="Frequent Perlin noise sampling example">
-
-            <p>From the above, we can see that the values sampled are <em>a lot closer</em>; you can think of this as sampling the 10 points at <code>x = 0.2, 0.4, 0.6 ...</code>.</p>
-
-            <p>So the general takeaway is that we can generate smoother noise, by sampling more frequently. How do we do that? We can just divide <code>x</code>, <code>y</code> before feeding it into the noise function!</p>
-
-            <div id="SmoothNoiseHeightMap"></div>
-
-            <h2>Task: Smooth Noise</h2>
-
-            <p>Use the tools above to generate some smooth perlin noise! Have a variable called the smoothing factor, and change its value to see how the noise varies.</p>
-
-            <h2>Creating Islands</h2>
-
-            <p>We now have the tools to create islands! By designating pixel with noise values past a certain threshold as "land" and the rest as "ocean", we can generate islands.
-                Since the <strong>noise()</strong> function returns a value between 0 and 1, we should have a threshold value between 0 and 1.
-            </p>
-
-            <pre><code class="language-javascript">const threshold = 0.55;
-
-function getColour(noiseVal){
-  if(noiseVal > threshold){
-    return color(239, 221, 111); // sandy yellow (island)
-  }else{
-    return color(0, 157, 196); // ocean blue
-  }
-}</code></pre>
-
-            <p>Note that the above function returns a "colour" object; if you want to work with large p5.js programs, then you should really be using classes and objects.
-                Now we can use the returned colour object like so:
-            </p>
-
-            <pre><code class="language-javascript">let colour = getColour(noise(x/sf, y/sf)); // colour object
-stroke(colour); // stroke accepts the colour object directly (instead of number values representing a colour)</code></pre>
-
-            <h2>Task: Desert Islands</h2>
-
-            <p>Create desert island generation by modifying your smooth noise task, with the above tools. It should look something like below:</p>
-
-            <div id="DesertIslands"></div>
-
-            <h3>More Detailed Islands</h3>
-
-            <p>Sometimes, you want more detailed islands; you want the overall shape of the islands to be the same so you have the same smoothness factor,
-                but you want there to be some more granular detail. You might want your beaches to have some roughness to its terrain.
-
-                After all, terrain isn't perfectly smooth in nature!
-            </p>
-
-            <p>You can add this granular detail by adding layers of perlin noise together; each of these layers being called "octaves".
-                Typically, you'll have a large amplitude perlin noise wave which describes the general overall shape,
-                and then you'll have a smaller amplitude perlin noise waves to describe the finer details.
-                These smaller waves usually have higher frequency, which will give the islands a distinct roughness.
-            </p>
-
-            <p>You can increase the number of octaves and how much the smaller waves contribute to the noise by using p5's <strong>noiseDetail()</strong> function.
-                Read up on the details <a href="https://p5js.org/reference/p5/noiseDetail/">here</a>.
-            </p>
-
-            <p>You can also add more "detail" to the islands by creating multiple threshold levels, like in the example at the top of this webpage! An example of a more complicated threshold colour function:</p>
-
-            <pre><code class="language-javascript">const snowcapThreshold = 0.75;
-const mountainThreshold = 0.6;
-const grassThreshold = 0.4;
-const shallowWaterThreshold = 0.35;
-
-function getColour(noiseVal){
-  if(noiseVal > snowcapThreshold){
-    return color(219, 219, 219); // snowcap white
-  }else if(noiseVal > mountainThreshold){
-    return color(112, 112, 112); // mountain gray
-  }else if(noiseVal > grassThreshold){
-    return color(75, 139, 59); // grass green
-  }else if(noiseVal > shallowWaterThreshold){
-    return color(0, 157, 196); // light blue
-  }else{
-    return color(0, 147, 186); // slightly darker blue
-  }
-}</code></pre>
-
-            <h2>Create your own islands!</h2>
-
-            <p>You have everything you need to create your own amazing terrain generation!
-                You can take my generator(s) (displayed at the top of the page) as inspiration, but I'm sure you'll be able to create a better looking generator than mine.
-            </p>
-
-            <p>You can view the code for the desert island generator here: <a href="https://editor.p5js.org/RexMortem/sketches/sk3iSZ_ly">Desert Island Generator</a> </p>
-
-            <p><strong>Tip:</strong> Getting good terrain with perlin noise is often a case of just tweaking your parameters (octaves, amplitude/frequency, smooth factor etc) until they're <em>just</em> right.</p>
-        </section>
-
-        <section class="tutorial-section">
-            <h2>Extension: Unbounded Terrain</h2>
-
-            <p>One of the key advantages of procedural generation is that you can generate infinite terrain. 
-                We'll explore this by generating terraria-like terrain that we'll be able to scroll through
-                using our arrow keys.
-            </p>
-
-            <h3>Generating Terraria-like Terrain with 1D Noise</h3>
-            
-            <p>We can generate a y-value for every x-value using 1D noise - then, we can draw lines of varying colours depending
-                on how high the y value is. For example:
-
-                <ul>
-                    <li>y=40 might just have a dirt line</li>
-                    <li>y=100 might have a dirt line with a grass line on top</li>
-                    <li>y=200 might have a dirt line with a grass line on top and a moutain grey line on top of that one</li>
-                </ul>
-
-                We could handle this stacking behaviour by drawing the lower levels first!
-            </p>
-            
-            <p>For this sketch, we'll have the following values: </p>
-            
-
-             <pre><code class="language-javascript">const width = 400;
-const height = 400;
-const sf = 50;
-
-const snowcapThreshold = 0.5 * height;
-const mountainThreshold = 0.4 * height;
-const grassThreshold = 0.15 * height;
-// dirt threshold is 0
-
-let xOffset = 0;
-</code></pre>
-
-        <p><strong>Task: </strong> Fill in the following code snippet:</p>
-        
-        <pre><code class="language-javascript">function drawTerrain(){
-  background(0, 157, 196);
-
-  for(let x = 0; x &lt width; x++){
-    let y = 65 + noise(x/sf) * height;
-    
-    stroke(120, 45, 0); // brown
-    line(x, height-y, x, height);
-    
-    if (y > grassThreshold){
-      // fill this in
-    }
-    
-    if(y > mountainThreshold){
-      // fill this in
-    }
-    
-    if(y > snowcapThreshold){
-      // fill this in
-    }
-  }
-}
-</code></pre>
-
-        <p>Also test the function by calling <code>drawTerrain()</code> in <code>setup()</code>!</p>
-        
-        <h3>Adding Interactivity</h3>
-
-        <p>We want two different ways to interact: 
-
-            <ul>
-                <li>Clicking to regenerate terrain (with a different seed) </li>
-                <li>Arrow keys to scroll</li>
-            </ul>
+        <p>Put this code inside of <code>index.html</code>, push the file to your repository, and go to the repository on GitHub.
+        You should see the following: 
+    </p>
+        <img src="/Portfolio/Images/GH-Status.png" alt="GitHub Pages status screenshot">
+
+        <p>If you click on the brown dot, you'll get information about your deployment to GH Pages. 
+            When it has fully processed, which you can see under "Deployments" on the right-hand side of the page,
+            you can check out your site at: 
         </p>
 
-        <p><strong>Regenerating Terrain Task:</strong> Write a function <code>drawTerrainWithReset()</code> that sets the seed to a new random value and then draws the new terrain.</p>
+        <p><strong>YourGitHubName</strong>.github.io/<strong>YourRepositoryName</strong></p>
 
-        <p>We can then use this function like this:</p>
-
-        <pre><code class="language-javascript">function setup() {
-  createCanvas(width, height);
-  
-  noiseDetail(4,0.28);
-
-  drawTerrainWithReset();
-}
-
-function onSim(){
-        return ((mouseX >= 0) && (mouseX &lt= width) && (mouseY >= 0) && (mouseY &lt= height));
-    }
-
-function mouseClicked(){
-  if(onSim()){
-    drawTerrainWithReset();
-  }
-}
-</code></pre>
-        <p><strong>Scrolling task: </strong>We will use an x-offset variable. We will have to do the following:
-        
-            <ul>
-                <li>Edit the existing <code>drawTerrain()</code> code to use <code>xOffset</code> when inputting into the <code>noise()</code> function</li>
-                <li>Add code to change the <code>xOffset</code> variable when arrow keys are pressed - for this, fill in the following code snippet: </li>
-
-                <pre><code class="language-javascript">function keyPressed(event) {
-  if(onSim()){
-    if (keyCode === RIGHT_ARROW){
-      // fill me 
-    }else if(keyCode === LEFT_ARROW){
-      // fill me
-    }
-  }
-}
-</code></pre>
-            </ul>
-
-            <p> <strong>Tip: </strong> Think about whether you should regenerate the terrain or not.</p>
-        </p>
-
-         <p><em>Code for this section: <a href="https://editor.p5js.org/RexMortem/sketches/-9_U5dF6S">https://editor.p5js.org/RexMortem/sketches/-9_U5dF6S</a></em></p>
-         
+        <p>Congratulations! You've made the site. </p>
         </section>
 
         <section class="tutorial-section">
-            <h2>Going Further</h2>
-
-            <p>If you want to make your generator even cooler, then you can explore more procedural generation techniques. Natural next steps include:</p>
-
-            <ul>
-                <li>Adding rivers (perhaps using perlin worms)</li>
-                <li>Adding trees e.g. with poisson-disc sampling</li>
-                <li>Structure generation</li>
-            </ul>
-           
-        </section>
-
-        <section class="tutorial-section">
-            <h2>Resources</h2>
-            <p>This workshop wouldn't have been possible without the existing work and tutorials on perlin noise.
-                If you're interested in learning more, check out Ken Perlin.
+            <h2>Using Bootstrap</h2>
+            <p>We'll use bootstrap to help style our site because doing it from scratch with raw HTML/CSS/JS would take a while (but is a good exercise for learning).</p>
+            
+            <h3>How does Bootstrap work? </h3>
+            <p>
+                Bootstrap is a front-end framework that provides prebuilt CSS styles and JavaScript behaviors.
+                You add Bootstrap class names to regular HTML elements, and those elements get consistent, responsive styling.
             </p>
+            <p>
+                A <strong>component</strong> is a reusable UI building block, such as a navbar, card, alert, button, or modal.
+                We'll look at a couple examples of components in the coming code snippets - the main thing is that you can look at 
+                their documentation here: <a href="https://getbootstrap.com/docs/5.3/components">https://getbootstrap.com/docs/5.3/components</a>
+            </p>
+
+            <h3>Importing Bootstrap using CDNs</h3>
+            <p>Add the following inside your <code>&lt;head&gt;</code>:</p>
+            <pre><code class="language-html">
+&lt;link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"&gt;
+&lt;link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"&gt;
+</code></pre>
+
+            <p>Add this just before <code>&lt;/body&gt;</code> so interactive components work:</p>
+            <pre><code class="language-html">
+&lt;script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"&gt;&lt;/script&gt;
+</code></pre>
+
+            <h3>Bootstrap Example: NavBar </h3>
+            <p>Navbar code (put this into <code>&lt;/body&gt;</code> to see what it does):</p>
+            <pre><code class="language-html">
+&lt;nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom sticky-top"&gt;
+    &lt;div class="container"&gt;
+        &lt;a class="navbar-brand fw-semibold" href="#"&gt;Ed's Portfolio&lt;/a&gt;
+        &lt;button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation"&gt;
+            &lt;span class="navbar-toggler-icon"&gt;&lt;/span&gt;
+        &lt;/button&gt;
+        &lt;div class="collapse navbar-collapse" id="mainNavbar"&gt;
+            &lt;ul class="navbar-nav ms-auto mb-2 mb-lg-0"&gt;
+                &lt;li class="nav-item"&gt;
+                    &lt;a class="nav-link" href="https://github.com/RexMortem" target="_blank" rel="noopener noreferrer"&gt;
+                        &lt;i class="bi bi-github me-1"&gt;&lt;/i&gt;GitHub
+                    &lt;/a&gt;
+                &lt;/li&gt;
+                &lt;li class="nav-item"&gt;
+                    &lt;a class="nav-link" href="https://www.linkedin.com/in/edward-denton-416a30240/" target="_blank" rel="noopener noreferrer"&gt;
+                        &lt;i class="bi bi-linkedin me-1"&gt;&lt;/i&gt;LinkedIn
+                    &lt;/a&gt;
+                &lt;/li&gt;
+                &lt;li class="nav-item"&gt;
+                    &lt;a class="nav-link" href="mailto:Edward.Denton@warwick.ac.uk"&gt;
+                        &lt;i class="bi bi-envelope-fill me-1"&gt;&lt;/i&gt;Email
+                    &lt;/a&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;/nav&gt;
+</code></pre>
+            <p>What this navbar does:</p>
+            <ul>
+                <li><code>navbar-expand-lg</code> shows a full horizontal menu on large screens and collapses it on smaller screens.</li>
+                <li><code>sticky-top</code> keeps the navbar visible at the top while scrolling.</li>
+                <li><code>navbar-toggler</code> is the mobile menu button.</li>
+                <li><code>data-bs-target="#mainNavbar"</code> connects the button to the collapsible menu container.</li>
+                <li><code>ms-auto</code> pushes nav links to the right side.</li>
+                <li><code>bi ...</code> classes display Bootstrap Icons for GitHub, LinkedIn, and Email.</li>
+                <li><code>target="_blank" rel="noopener noreferrer"</code> opens external links in a new tab safely.</li>
+            </ul>
+            
+            <p>Don't worry about all the exact details though - Bootstrap has quite a bit of boilerplate in it,
+                which can be overwhelming for someone starting. Just start looking at examples in their documentation
+                and tweaking them to see how changing one thing affects the output. 
+            </p>
+        </section>
+        
+        <section class="tutorial-section">
+            <h2>Going Further: React</h2>
+            <p>
+                Our site just uses bootstrap since that's enough for our small site - if you want to 
+                build something more substantial, our society has a React course which you can find here: <a href="https://readytoreact.net/">https://readytoreact.net/</a>
+            </p>
+            
+        </section>
+
+        <section class="tutorial-section">
+            <h2>Title</h2>
+            <p>
+                aaa
+            </p>
+            
+            
+        </section>
+
+        <section class="tutorial-section">
+            <h2>Title</h2>
+            <p>
+                aaa
+            </p>
+            
+            
         </section>
     </div>
-
-    <script>
-let DetailedDesertMap = new p5((sk) => {
-    const width = 150;
-    const height = 150;
-
-    const sf = 25;
-
-    // I love having hardcoded threshold values 
-    function getColour(noiseVal){
-        if (noiseVal > 0.7){
-            return sk.color(209, 191, 81); // darker yellow
-        } else if (noiseVal > 0.55){
-            return sk.color(239, 221, 111); // sandy yellow (island)
-        } else if (noiseVal > 0.4){
-            return sk.color(0, 157, 196); // ocean blue
-        } else{
-            return sk.color(0, 127, 166); // deeper blue
-        }
-    }
-
-    function drawMap(){
-        sk.background(255,255,255);
-        sk.noiseSeed(Math.random()*1000);
-        
-        for(let x = 0; x < width; x++){
-            for(let y = 0; y < height; y++){
-                sk.stroke(getColour(sk.noise(x/sf, y/sf)));
-                sk.point(x,y);
-            }
-        }
-    }
-
-    sk.setup = () => {
-        let cnv = sk.createCanvas(width, height);
-        cnv.parent("DetailedDesertIslands");
-
-        sk.noiseDetail(8, 0.5);
-        sk.describe("Click to generate new Perlin Noise threshold map!");
-        
-        drawMap();
-    }
-
-    function onSim(){
-        return ((sk.mouseX >= 0) && (sk.mouseX <= width) && (sk.mouseY >= 0) && (sk.mouseY <= height));
-    }
-
-    sk.mouseClicked = () => {
-        if(onSim()){
-            drawMap();
-        }
-    }
-});
-    </script>
-
-
-    <script>
-        let desertIslands = new p5((sk) => {
-    const width = 150;
-    const height = 150;
-
-    const threshold = 0.55;
-    const sf = 25;
-
-    function getColour(noiseVal){
-        if(noiseVal > threshold){
-            return sk.color(239, 221, 111); // sandy yellow (island)
-        }else{
-            return sk.color(0, 157, 196); // ocean blue
-        }
-    }
-
-    function drawMap(){
-        sk.background(255,255,255);
-        sk.noiseSeed(Math.random()*1000);
-        
-        for(let x = 0; x < width; x++){
-            for(let y = 0; y < height; y++){
-                let c = getColour(sk.noise(x/sf, y/sf));
-                sk.stroke(c);
-                sk.point(x,y);
-            }
-        }
-    }
-
-    sk.setup = () => {
-        let cnv = sk.createCanvas(width, height);
-        cnv.parent("DesertIslands");
-
-        sk.describe("Click to generate desert islands!");
-        
-        drawMap();
-    }
-
-    function onSim(){
-        return ((sk.mouseX >= 0) && (sk.mouseX <= width) && (sk.mouseY >= 0) && (sk.mouseY <= height));
-    }
-
-    sk.mouseClicked = () => {
-        if(onSim()){
-            drawMap();
-        }
-    }
-});
-    </script>
 </body>
 </html>

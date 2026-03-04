@@ -1,8 +1,7 @@
-# Boids Workshop
+# Portfolio Websitee
 
-Workshop: [https://uwcs.github.io/boids/](https://uwcs.github.io/boids/)
+Workshop: [https://uwcs.github.io/Portfolio/](https://uwcs.github.io/Portfolio/)
 
 ## Key Technologies 
 
-- jQuery 
 - Bootstrap 3.4.1
